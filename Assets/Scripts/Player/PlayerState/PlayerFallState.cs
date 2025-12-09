@@ -15,7 +15,7 @@ public class PlayerFallState : PlayerBaseState
 
         if (player.onWall)
         {
-            player.SwitchState(player.WallJumpState);
+            player.SwitchState(player.WallSlideState);
         }
 
         if (player.isGrounded)
