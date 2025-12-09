@@ -1,6 +1,6 @@
 using UnityEngine;
 
-    public class PlayerWallJumpState : PlayerBaseState
+    public class PlayerWallSlideState : PlayerBaseState
     {
         public override void EnterState(PlayerStateManager player)
         {

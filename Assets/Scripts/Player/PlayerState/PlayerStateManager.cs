@@ -62,14 +62,14 @@ public class PlayerStateManager : Entity
     [HideInInspector] public float comboCooldown = 0.7f;
 
     PlayerBaseState currentState;
-    public PlayerIdleState IdleState = new PlayerIdleState();
-    public PlayerMoveState MoveState = new PlayerMoveState();
-    public PlayerBaseState JumpState = new PlayerJumpState();
-    public PlayerBaseState FallState = new PlayerFallState();
-    public PlayerBaseState AttackState = new PlayerAttackState();
-    public PlayerBlockState BlockState = new PlayerBlockState();
-    public PlayerWallJumpState WallJumpState = new PlayerWallJumpState();
-    public PlayerHurtAndDeadState HurtAndDeadState = new PlayerHurtAndDeadState();
+    public PlayerIdleState IdleState = new();
+    public PlayerMoveState MoveState = new();
+    public PlayerJumpState JumpState = new();
+    public PlayerFallState FallState = new();
+    public PlayerAttackState AttackState = new();
+    public PlayerBlockState BlockState = new();
+    public PlayerWallSlideState WallSlideState = new();
+    public PlayerHurtAndDeadState HurtAndDeadState = new();
 
     protected override void Awake()
     {
