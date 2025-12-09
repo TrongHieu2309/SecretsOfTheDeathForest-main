@@ -1,0 +1,173 @@
+using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class GameManager : MonoBehaviour
+{
+    public static GameManager instance { get; private set; }
+
+    [SerializeField] private TextMeshProUGUI coinText;
+    [SerializeField] private Animator animAddCoin;
+    [SerializeField] private GameObject pauseGameUI;
+    [SerializeField] private GameObject gameOverUI;
+    [SerializeField] private GameObject winningUI;
+    [SerializeField] private GameObject goalPoint;
+    [SerializeField] private GameObject limitPoint;
+    [SerializeField] private AudioClip takeCoin;
+
+    public bool isPauseGame;
+    public bool isGameOver;
+    public bool isWinGame;
+    private float currentCoin;
+
+    void Awake()
+    {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+
+        pauseGameUI.SetActive(false);
+        gameOverUI.SetActive(false);
+        goalPoint.SetActive(false);
+        limitPoint.SetActive(true);
+        winningUI.SetActive(false);
+        isWinGame = false;
+    }
+
+    private void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked; 
+        Cursor.visible = false;
+    }
+
+    private void OnApplicationFocus()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void OnApplicationQuit()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    void Update()
+    {
+        if (isGameOver)
+        {
+            ToggleGameOver();
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
+        NextLevel();
+    }
+
+    /*-----COIN MANAGEMENT-----*/
+    #region Coin Management
+    public void AddCoins(float coinValue)
+    {
+        currentCoin += coinValue;
+        animAddCoin.SetTrigger("addCoin");
+        SoundManager.instance.PlaySound(takeCoin);
+        UpdateCoins();
+    }
+
+    private void UpdateCoins()
+    {
+        // coinText.text = currentCoin.ToString() + " x";
+        coinText.text = $"{currentCoin} x";
+    }
+    #endregion
+
+    /*-----ENERGY MANAGEMENT-----*/
+    #region Energy Management
+    public void AddEnergy(float energyValue)
+    {
+        PlayerStateManager.instance.currentSkill = Mathf.Min(PlayerStateManager.instance.currentSkill + energyValue, PlayerStateManager.instance.maxSkill);
+        SoundManager.instance.PlaySound(takeCoin);
+        UpdateEnergy();
+    }
+
+    private void UpdateEnergy()
+    {
+        PlayerStateManager.instance.UpdateSkillBar();
+    }
+    #endregion
+
+    /*-----USER INTERFACE MANAGEMENT-----*/
+    #region UI Management
+    private void TogglePause()
+    {
+        isPauseGame = !isPauseGame;
+        pauseGameUI.SetActive(isPauseGame);
+        Time.timeScale = isPauseGame ? 0f : 1f;
+    }
+
+
+    private void ToggleGameOver()
+    {
+        gameOverUI.SetActive(isGameOver);
+        Time.timeScale = isGameOver == true ? 0f : 1f;
+    }
+
+    private void ToggleWinning()
+    {
+        winningUI.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    public void WinGame()
+    {
+        ToggleWinning();
+        isWinGame = true;
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+    #endregion
+
+    private void NextLevel()
+    {
+        if (coinText.text == "10 x")
+        {
+            goalPoint.SetActive(true);
+            limitPoint.SetActive(false);
+        }
+    }
+
+    /*-----EVENT ANIMATION-----*/   
+    #region Event Aniamtion
+    public void HandleRestart()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    public void Resume()
+    {
+        TogglePause();
+    }
+    public void Quit()
+    {
+        Application.Quit();
+
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+    }
+
+    public void GameOverManagement()
+    {
+        isGameOver = true;
+    }
+    #endregion
+}
